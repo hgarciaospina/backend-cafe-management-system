@@ -22,8 +22,6 @@ import java.io.Serializable;
 @DynamicUpdate
 @DynamicInsert
 @Table(name = "user")
-@NoArgsConstructor
-@AllArgsConstructor
 public class User implements Serializable {
 
     @Serial
