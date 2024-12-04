@@ -14,15 +14,15 @@ public class AuthenticationConfig {
     @Autowired
     private CustomerUsersDetailsService customerUsersDetailsService;
 
-    // No se necesita construir un AuthenticationManager a partir de un AuthenticationManagerBuilder
+    // There is no need to build an AuthenticationManager from an AuthenticationManagerBuilder
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        // Aquí usamos AuthenticationManager directamente desde el AuthenticationConfiguration
+        // Here we use AuthenticationManager directly from the AuthenticationConfiguration
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Usar BCryptPasswordEncoder para la codificación de contraseñas
+        return new BCryptPasswordEncoder(); // Using BCryptPasswordEncoder for password encoding
     }
 }

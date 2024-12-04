@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.http.HttpServletResponse;
@@ -38,26 +37,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Desactivar CSRF para API REST
+                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for REST API
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/user/login", "/user/forgotPassword").permitAll() // Rutas públicas
-                        .anyRequest().authenticated() // Todas las demás requieren autenticación
+                        .requestMatchers("/user/login", "/user/signup", "/user/forgotPassword")
+                        .permitAll() // Public routes
+                        .anyRequest().authenticated() // All others require authentication
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint((request, response, authException) -> {
-                            // Respuesta personalizada para errores de autenticación (401)
                             response.setContentType("application/json");
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.getWriter().write("{\"message\":\"Unauthorized access\"}");
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            // Respuesta personalizada para errores de autorización (403)
                             response.setContentType("application/json");
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                             response.getWriter().write("{\"message\":\"Access denied\"}");
                         })
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // JwtFilter antes del filtro de autenticación
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Ensure JWT filter runs before Spring's default filter chain
 
         return http.build();
     }

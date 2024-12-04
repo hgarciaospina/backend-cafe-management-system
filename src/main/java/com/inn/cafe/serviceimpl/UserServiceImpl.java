@@ -1,5 +1,6 @@
 package com.inn.cafe.serviceimpl;
 
+import com.google.common.base.Strings;
 import com.inn.cafe.constents.CafeConstants;
 import com.inn.cafe.dao.UserDao;
 import com.inn.cafe.jwt.CustomerUsersDetailsService;
@@ -161,6 +162,63 @@ public class UserServiceImpl implements UserService {
             emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Approved", "USER:- " + user + " \n is approved by \nADMIN:-" + jwtFilter.getCurrentUser(), allAdmin);
         }else{
             emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Disabled", "USER:- " + user + " \n is disabled by \nADMIN:-" + jwtFilter.getCurrentUser(), allAdmin);
+        }
+    }
+    @Override
+    public ResponseEntity<String> checkToken() {
+        return CafeUtils.getResponseEntity("true", HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
+        try {
+            // Obtener el usuario autenticado actual usando el filtro JWT
+            User userObj = userDao.findByEmail(jwtFilter.getCurrentUser());
+
+            if (userObj != null) {
+                // Comparar la contraseña antigua con la almacenada usando el PasswordEncoder
+                if (passwordEncoder.matches(requestMap.get("oldPassword"), userObj.getPassword())) {
+                    // Codificar la nueva contraseña antes de almacenarla
+                    userObj.setPassword(passwordEncoder.encode(requestMap.get("newPassword")));
+                    userDao.save(userObj); // Guardar los cambios en la base de datos
+                    return CafeUtils.getResponseEntity("Password Updated Successfully", HttpStatus.OK);
+                }
+                return CafeUtils.getResponseEntity("Incorrect Old Password", HttpStatus.BAD_REQUEST);
+            }
+            return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception ex) {
+            log.error("Error during password change: {}", ex.getMessage());
+            return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> forgotPassword(Map<String, String> requestMap) {
+        try {
+            // Find user by email
+            User user = userDao.findByEmail(requestMap.get("email"));
+
+            if (user != null && !Strings.isNullOrEmpty(user.getEmail())) {
+                // Generate a temporary password
+                String tempPassword = CafeUtils.generateRandomPassword(); // Utility method to generate a random password
+
+                // Encode the temporary password before saving to the database
+                user.setPassword(passwordEncoder.encode(tempPassword));
+                userDao.save(user);
+
+                // Send the temporary password to the user's email
+                emailUtils.forgotMail(user.getEmail(),
+                        "Credentials by Cafe Management System",
+                        "Your temporary password is: " + tempPassword);
+
+                return CafeUtils.getResponseEntity("Check your mail for credentials.", HttpStatus.OK);
+            } else {
+                return CafeUtils.getResponseEntity("User not found with the provided email.", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception ex) {
+            log.error("Error during forgot password: {}", ex.getMessage());
+            ex.printStackTrace();
+            return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
