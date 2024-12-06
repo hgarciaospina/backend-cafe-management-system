@@ -1,21 +1,26 @@
 package com.inn.cafe.pojo;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serial;
 import java.io.Serializable;
-@NamedQuery(name = "User.findByEmailId", query = "select u from User u where u.email=:email")
+@NamedQuery(
+        name = "User.findByEmailId",
+        query = "select u from User u where u.email=:email")
 
-@NamedQuery(name = "User.getAllUser", query = "select new com.inn.cafe.wrapper.UserWrapper(U.id,U.name,U.email,U.contactNumber,U.status) from User U where U.role='user'")
+@NamedQuery(
+        name = "User.getAllUser",
+        query = "select new com.inn.cafe.wrapper.UserWrapper(U.id,U.name,U.email,U.contactNumber,U.status) from User U where U.role='user'")
 
-@NamedQuery(name = "User.updateStatus", query = "update User U set U.status=:status where U.id=:id")
+@NamedQuery(name = "User.updateStatus",
+        query = "update User U set U.status=:status where U.id=:id")
 
-@NamedQuery(name = "User.getAllAdmin", query = "select U.email from User U where U.role='admin'")
+@NamedQuery(name = "User.getAllAdmin",
+        query = "select U.email from User U where U.role='admin'")
 
 @Data
 @Entity
