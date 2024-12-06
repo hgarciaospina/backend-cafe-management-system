@@ -1,6 +1,7 @@
 package com.inn.cafe.serviceimpl;
 
-import com.inn.cafe.constents.CafeConstants;
+import com.inn.cafe.constants.CafeConstants;
+import com.inn.cafe.constants.ProductConstants;
 import com.inn.cafe.dao.CategoryDao;
 import com.inn.cafe.dao.ProductDao;
 import com.inn.cafe.jwt.JwtFilter;
@@ -41,14 +42,14 @@ public class ProductServiceImpl implements ProductService {
 
             // Validate input data
             if (!isValidRequest(requestMap, false)) {
-                return CafeUtils.getResponseEntity(CafeConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
+                return CafeUtils.getResponseEntity(ProductConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
             }
 
             // Validate category existence
-            int categoryId = Integer.parseInt(requestMap.get("categoryId"));
+            int categoryId = Integer.parseInt(requestMap.get(ProductConstants.CATEGORY_ID));
             if (categoryExists(categoryId)) {
                 return CafeUtils.getResponseEntity(
-                        "Category with id " + categoryId + " does not exist.",
+                        String.format(ProductConstants.CATEGORY_NOT_FOUND, categoryId),
                         HttpStatus.BAD_REQUEST
                 );
             }
@@ -56,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
             // Map the input data to the Product entity and save it
             Product product = mapToProduct(requestMap, false);
             productDao.save(product);
-            return CafeUtils.getResponseEntity("Product Added Successfully.", HttpStatus.OK);
+            return CafeUtils.getResponseEntity(ProductConstants.PRODUCT_ADDED_SUCCESS, HttpStatus.OK);
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -79,17 +80,17 @@ public class ProductServiceImpl implements ProductService {
         try {
             if (jwtFilter.isAdmin()) {
                 if (isValidRequest(requestMap, true)) { // Reuse the validation method for consistency
-                    int productId = Integer.parseInt(requestMap.get("id"));
+                    int productId = Integer.parseInt(requestMap.get(ProductConstants.ID));
                     Optional<Product> optional = productDao.findById(productId);
 
                     if (optional.isPresent()) {
                         Product existingProduct = optional.get();
 
                         // Validate category existence if changed
-                        int newCategoryId = Integer.parseInt(requestMap.get("categoryId"));
+                        int newCategoryId = Integer.parseInt(requestMap.get(ProductConstants.CATEGORY_ID));
                         if (newCategoryId != existingProduct.getCategory().getId() && categoryExists(newCategoryId)) {
                             return CafeUtils.getResponseEntity(
-                                    "Category with id " + newCategoryId + " does not exist.",
+                                    String.format(ProductConstants.CATEGORY_NOT_FOUND, newCategoryId),
                                     HttpStatus.BAD_REQUEST
                             );
                         }
@@ -99,15 +100,15 @@ public class ProductServiceImpl implements ProductService {
                         product.setStatus(existingProduct.getStatus()); // Preserve existing status
                         productDao.save(product);
 
-                        return CafeUtils.getResponseEntity("Product Updated Successfully.", HttpStatus.OK);
+                        return CafeUtils.getResponseEntity(ProductConstants.PRODUCT_UPDATED_SUCCESS, HttpStatus.OK);
                     } else {
                         return CafeUtils.getResponseEntity(
-                                "Product with id " + productId + " does not exist.",
+                                String.format(ProductConstants.PRODUCT_NOT_FOUND, productId),
                                 HttpStatus.NOT_FOUND
                         );
                     }
                 } else {
-                    return CafeUtils.getResponseEntity(CafeConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
+                    return CafeUtils.getResponseEntity(ProductConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
                 }
             } else {
                 return CafeUtils.getResponseEntity(CafeConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
@@ -136,25 +137,22 @@ public class ProductServiceImpl implements ProductService {
      * @return true if the request is valid, false otherwise.
      */
     private boolean isValidRequest(Map<String, String> requestMap, boolean validateId) {
-        if (!requestMap.containsKey("name") ||
-                !requestMap.containsKey("categoryId") ||
-                !requestMap.containsKey("price") ||
-                !requestMap.containsKey("description")) {
+        if (!requestMap.containsKey(ProductConstants.NAME) ||
+                !requestMap.containsKey(ProductConstants.CATEGORY_ID) ||
+                !requestMap.containsKey(ProductConstants.PRICE) ||
+                !requestMap.containsKey(ProductConstants.DESCRIPTION)) {
             return false;
         }
 
-        if (requestMap.get("name").trim().isEmpty() ||
-                requestMap.get("categoryId").trim().isEmpty() ||
-                requestMap.get("price").trim().isEmpty() ||
-                requestMap.get("description").trim().isEmpty()) {
+        if (requestMap.get(ProductConstants.NAME).trim().isEmpty() ||
+                requestMap.get(ProductConstants.CATEGORY_ID).trim().isEmpty() ||
+                requestMap.get(ProductConstants.PRICE).trim().isEmpty() ||
+                requestMap.get(ProductConstants.DESCRIPTION).trim().isEmpty()) {
             return false;
         }
 
-        if (validateId && (!requestMap.containsKey("id") || requestMap.get("id").trim().isEmpty())) {
-            return false;
-        }
+        return !(validateId && (!requestMap.containsKey(ProductConstants.ID) || requestMap.get(ProductConstants.ID).trim().isEmpty()));
 
-        return true;
     }
 
     /**
@@ -167,18 +165,18 @@ public class ProductServiceImpl implements ProductService {
     private Product mapToProduct(Map<String, String> requestMap, boolean isUpdate) {
         Product product = new Product();
 
-        if (isUpdate && requestMap.containsKey("id")) {
-            product.setId(Integer.parseInt(requestMap.get("id").trim()));
+        if (isUpdate && requestMap.containsKey(ProductConstants.ID)) {
+            product.setId(Integer.parseInt(requestMap.get(ProductConstants.ID).trim()));
         } else {
             product.setStatus("true"); // Default status for new products
         }
 
-        product.setName(requestMap.get("name").trim());
-        product.setDescription(requestMap.get("description").trim());
-        product.setPrice(Integer.parseInt(requestMap.get("price").trim()));
+        product.setName(requestMap.get(ProductConstants.NAME).trim());
+        product.setDescription(requestMap.get(ProductConstants.DESCRIPTION).trim());
+        product.setPrice(Integer.parseInt(requestMap.get(ProductConstants.PRICE).trim()));
 
         Category category = new Category();
-        category.setId(Integer.parseInt(requestMap.get("categoryId").trim()));
+        category.setId(Integer.parseInt(requestMap.get(ProductConstants.CATEGORY_ID).trim()));
         product.setCategory(category);
 
         return product;

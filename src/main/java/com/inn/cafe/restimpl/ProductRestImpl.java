@@ -1,6 +1,6 @@
 package com.inn.cafe.restimpl;
 
-import com.inn.cafe.constents.CafeConstants;
+import com.inn.cafe.constants.CafeConstants;
 import com.inn.cafe.rest.ProductRest;
 import com.inn.cafe.service.ProductService;
 import com.inn.cafe.utils.CafeUtils;
