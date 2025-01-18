@@ -119,6 +119,50 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
+    public ResponseEntity<String> deleteProduct(Integer id) {
+        try {
+            if(jwtFilter.isAdmin()){
+              Optional<Product> optional = productDao.findById(id);
+              if(optional.isPresent()) {
+                productDao.deleteById(id);
+                return CafeUtils.getResponseEntity(
+                  String.format(ProductConstants.PRODUCT_DELETED_SUCCESS, id), HttpStatus.OK);
+
+              }
+              return CafeUtils.getResponseEntity(
+                      String.format(ProductConstants.PRODUCT_NOT_FOUND, id), HttpStatus.NOT_FOUND) ;
+            }else{
+                return CafeUtils.getResponseEntity(CafeConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> updateStatus(Map<String, String> requestMap) {
+        try{
+            if(jwtFilter.isAdmin()){
+                Optional<Product> optional = productDao.findById(Integer.parseInt(requestMap.get("id")));
+                if(optional.isPresent()) {
+                    productDao.updateProductStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
+                    return CafeUtils.getResponseEntity(ProductConstants.PRODUCT_STATUS_UPDATES_SUCCESS, HttpStatus.OK);
+
+                }
+                return CafeUtils.getResponseEntity(
+                        String.format(ProductConstants.PRODUCT_NOT_FOUND, Integer.parseInt(requestMap.get("id"))), HttpStatus.NOT_FOUND) ;
+            }else{
+                return CafeUtils.getResponseEntity(CafeConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     /**
      * Checks if a category with the given ID exists in the database.
      *

@@ -5,7 +5,7 @@ package com.inn.cafe.constants;
  */
 public class ProductConstants {
 
-    public ProductConstants() {
+    private ProductConstants() {
     }
 
     // Keys for request maps
@@ -16,8 +16,10 @@ public class ProductConstants {
     public static final String ID = "id";
 
     // Messages
-    public static final String PRODUCT_ADDED_SUCCESS = "Product Added Successfully.";
-    public static final String PRODUCT_UPDATED_SUCCESS = "Product Updated Successfully.";
+    public static final String PRODUCT_ADDED_SUCCESS = "Product added Successfully.";
+    public static final String PRODUCT_UPDATED_SUCCESS = "Product updated Successfully.";
+    public static final String PRODUCT_DELETED_SUCCESS = "Product with id %d deleted Successfully.";
+    public static final String PRODUCT_STATUS_UPDATES_SUCCESS = "Product status updated Successfully.";
     public static final String PRODUCT_NOT_FOUND = "Product with id %d does not exist.";
     public static final String CATEGORY_NOT_FOUND = "Category with id %d does not exist.";
     public static final String INVALID_DATA = "Invalid data";

@@ -2,7 +2,7 @@ package com.inn.cafe.constants;
 
 public class UserConstants {
 
-    public UserConstants() {
+    private UserConstants() {
     }
 
     // Messages

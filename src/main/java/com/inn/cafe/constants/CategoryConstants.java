@@ -4,6 +4,10 @@ package com.inn.cafe.constants;
  * Constants specific to the Category module.
  */
 public class CategoryConstants {
+
+    private CategoryConstants() {
+    }
+
     // Keys for request maps
     public static final String NAME = "name";
     public static final String ID = "id";

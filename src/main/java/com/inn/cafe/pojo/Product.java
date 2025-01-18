@@ -19,6 +19,11 @@ import java.io.Serializable;
             "from Product p"
 )
 
+@NamedQuery(
+        name = "Product.updateProductStatus",
+        query = "update Product p set p.status=:status where p.id =:id"
+)
+
 @Data
 @Entity
 @DynamicInsert
