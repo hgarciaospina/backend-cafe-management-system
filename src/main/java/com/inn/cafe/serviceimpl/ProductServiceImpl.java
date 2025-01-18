@@ -163,17 +163,6 @@ public class ProductServiceImpl implements ProductService {
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @Override
-    public ResponseEntity<List<ProductWrapper>> getByCategory(Integer id) {
-        try{
-            return new ResponseEntity<>(productDao.getProductByCategory(id), HttpStatus.OK);
-
-        }catch(Exception ex) {
-            ex.printStackTrace();
-        }
-        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     /**
      * Checks if a category with the given ID exists in the database.
      *
@@ -235,5 +224,26 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(category);
 
         return product;
+    }
+
+    @Override
+    public ResponseEntity<List<ProductWrapper>> getByCategory(Integer id) {
+        try{
+            return new ResponseEntity<>(productDao.getProductByCategory(id), HttpStatus.OK);
+
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    @Override
+    public ResponseEntity<ProductWrapper> getProductById(Integer id) {
+        try{
+            return new ResponseEntity<>(productDao.getProductById(id), HttpStatus.OK);
+
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
+        return new ResponseEntity<>(new ProductWrapper(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
