@@ -35,4 +35,8 @@ public class ProductWrapper {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
     }
+    public ProductWrapper(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

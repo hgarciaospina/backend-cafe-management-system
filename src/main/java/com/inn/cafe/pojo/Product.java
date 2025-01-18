@@ -24,6 +24,14 @@ import java.io.Serializable;
         query = "update Product p set p.status=:status where p.id =:id"
 )
 
+@NamedQuery(
+        name = "Product.getProductByCategory",
+        query = "select new com.inn.cafe.wrapper.ProductWrapper(p.id,p.name) " +
+                "from Product p where p.category.id=:id and p.status='true'"
+)
+
+
+
 @Data
 @Entity
 @DynamicInsert
